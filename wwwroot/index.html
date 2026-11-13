@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Items - UDI 2</title>
+</head>
+<body>
+    <h1>Lista de Items</h1>
+
+    <!-- Formulario para agregar un item (POST) -->
+    <input id="nombre" placeholder="Nombre del item">
+    <button onclick="agregar()">Agregar</button>
+
+    <!-- Aca se muestran los items (GET) -->
+    <ul id="lista"></ul>
+
+    <script>
+        // GET: pide los items a la API y los muestra en la lista
+        async function cargar() {
+            const respuesta = await fetch("/api/items");
+            const items = await respuesta.json();
+            let html = "";
+            for (const item of items) {
+                html += "<li>" + item.id + " - " + item.name +
+                        " <button onclick='borrar(" + item.id + ")'>Borrar</button></li>";
+            }
+            document.getElementById("lista").innerHTML = html;
+        }
+
+        // POST: envia un item nuevo a la API (categoria 1 y proveedor 1)
+        async function agregar() {
+            const nombre = document.getElementById("nombre").value;
+            await fetch("/api/items", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: nombre, categoriaId: 1, proveedorId: 1 })
+            });
+            document.getElementById("nombre").value = "";
+            cargar();
+        }
+
+        // DELETE: borra un item por su Id
+        async function borrar(id) {
+            await fetch("/api/items/" + id, { method: "DELETE" });
+            cargar();
+        }
+
+        cargar();
+    </script>
+</body>
+</html>
